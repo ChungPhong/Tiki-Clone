@@ -6,12 +6,14 @@ import BookPage from "pages/client/book";
 import AboutPage from "pages/client/about";
 import LoginPage from "pages/client/auth/login";
 import RegisterPage from "pages/client/auth/register";
-import "./styles/global.scss";
+import "styles/global.scss";
+import HomePage from "pages/client/home";
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
+      { index: true, element: <HomePage /> },
       {
         path: "/book",
         element: <BookPage />,
