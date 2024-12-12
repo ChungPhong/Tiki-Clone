@@ -14,6 +14,7 @@ const RegisterPage = () => {
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     console.log(values);
   };
+
   return (
     <div className="register-page">
       <main className="main">
