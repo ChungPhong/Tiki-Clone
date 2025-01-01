@@ -15,6 +15,7 @@ import {
 } from "antd";
 import type { FormProps } from "antd";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "styles/home.scss";
 
 type FieldType = {
@@ -43,7 +44,7 @@ const HomePage = () => {
   const [sortQuery, setSortQuery] = useState<string>("sort=-sold");
 
   const [form] = Form.useForm();
-
+  const navigate = useNavigate();
   useEffect(() => {
     const initCategory = async () => {
       const res = await getCategoryAPI();
@@ -311,7 +312,11 @@ const HomePage = () => {
                 <Row className="customize-row">
                   {listBook?.map((item, index) => {
                     return (
-                      <div className="column" key={`book-${index}`}>
+                      <div
+                        onClick={() => navigate(`/book/${item._id}`)}
+                        className="column"
+                        key={`book-${index}`}
+                      >
                         <div className="wrapper">
                           <div className="thumbnail">
                             <img
