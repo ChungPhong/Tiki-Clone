@@ -14,6 +14,8 @@ import { dateRangeValidate } from "@/services/helper";
 import DetailUser from "./detail.user";
 import CreateUser from "./create.user";
 import ImportUser from "./data/import.user";
+import { CSVLink } from "react-csv";
+
 type TSearch = {
   fullName: string;
   email: string;
@@ -21,6 +23,16 @@ type TSearch = {
   createdAtRange: string;
 };
 const TableUser = () => {
+  const headers = [
+    { label: "Id", key: "_id" },
+    { label: "Full Name", key: "fullName" },
+    { label: "Email", key: "email" },
+    { label: "Phone", key: "phone" },
+    { label: "Role", key: "role" },
+    { label: "createdAt", key: "createdAt" },
+    { label: "updatedAt", key: "updatedAt" },
+    // ...nếu bạn muốn thêm/bớt trường
+  ];
   const actionRef = useRef<ActionType>();
   const [meta, setMeta] = useState({
     current: 1,
@@ -32,6 +44,7 @@ const TableUser = () => {
   const [dataViewDetail, setDataViewDetail] = useState<IUserTable | null>(null);
   const [openModalCreate, setOpenModalCreate] = useState<boolean>(false);
   const [openModalImport, setOpenModalImport] = useState<boolean>(false);
+  const [currentDataTable, setCurrentDataTable] = useState<IUserTable[]>([]);
   const columns: ProColumns<IUserTable>[] = [
     {
       dataIndex: "index",
@@ -131,6 +144,7 @@ const TableUser = () => {
           const res = await getUsersAPI(query);
           if (res.data) {
             setMeta(res.data.meta);
+            setCurrentDataTable(res.data?.result ?? []);
           }
           return {
             data: res.data?.result,
@@ -157,7 +171,14 @@ const TableUser = () => {
         headerTitle="Table user"
         toolBarRender={() => [
           <Button icon={<ExportOutlined />} type="primary">
-            Export
+            <CSVLink
+              data={currentDataTable}
+              headers={headers}
+              separator=";"
+              filename="export-user.csv"
+            >
+              Export
+            </CSVLink>
           </Button>,
           <Button
             icon={<CloudUploadOutlined />}
