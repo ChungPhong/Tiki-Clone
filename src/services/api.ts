@@ -115,3 +115,24 @@ export const uploadFileAPI = (fileImg: any, folder: string) => {
     },
   });
 };
+
+export const createBookAPI = (
+  mainText: string,
+  author: string,
+  price: number,
+  quantity: number,
+  category: string,
+  thumbnail: string,
+  slider: string[]
+) => {
+  const urlBackend = "/api/v1/book";
+  return axios.post<IBackendRes<IRegister>>(urlBackend, {
+    mainText,
+    author,
+    price,
+    quantity,
+    category,
+    thumbnail,
+    slider,
+  });
+};

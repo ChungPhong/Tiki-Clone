@@ -14,7 +14,7 @@ import {
 } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import type { FormProps } from "antd";
-import { getCategoryAPI, uploadFileAPI } from "@/services/api";
+import { getCategoryAPI, uploadFileAPI, createBookAPI } from "@/services/api";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 import { MAX_UPLOAD_IMAGE_SIZE } from "@/services/helper";
 import { UploadChangeParam } from "antd/es/upload";
@@ -25,6 +25,7 @@ type UserUploadType = "thumbnail" | "slider";
 interface IProps {
   openModalCreate: boolean;
   setOpenModalCreate: (v: boolean) => void;
+  refreshTable: () => void;
 }
 type FieldType = {
   mainText: string;
@@ -36,7 +37,7 @@ type FieldType = {
   slider: any;
 };
 const CreateBook = (props: IProps) => {
-  const { openModalCreate, setOpenModalCreate } = props;
+  const { openModalCreate, setOpenModalCreate, refreshTable } = props;
   const { message, notification } = App.useApp();
   const [form] = Form.useForm();
   const [isSubmit, setIsSubmit] = useState(false);
@@ -66,9 +67,31 @@ const CreateBook = (props: IProps) => {
   }, []);
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     setIsSubmit(true);
-    console.log("values form: ", values, fileListThumbnail, fileListSlider);
-    console.log("values fileListThumbnail: ", fileListThumbnail);
-    console.log("values fileListSlider: ", fileListSlider);
+    const { mainText, author, price, quantity, category } = values;
+    const thumbnail = fileListThumbnail?.[0]?.name ?? "";
+    const slider = fileListSlider?.map((item) => item.name) ?? [];
+    const res = await createBookAPI(
+      mainText,
+      author,
+      price,
+      quantity,
+      category,
+      thumbnail,
+      slider
+    );
+    if (res && res.data) {
+      message.success("Tạo mới book thành công");
+      form.resetFields();
+      setFileListSlider([]);
+      setFileListThumbnail([]);
+      setOpenModalCreate(false);
+      refreshTable();
+    } else {
+      notification.error({
+        message: "Đã có lỗi xảy ra",
+        description: res.message,
+      });
+    }
     setIsSubmit(false);
   };
   const getBase64 = (file: FileType): Promise<string> => {
