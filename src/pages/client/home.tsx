@@ -18,10 +18,11 @@ import { useEffect, useState } from "react";
 import "styles/home.scss";
 
 type FieldType = {
-  fullName: string;
-  password: string;
-  email: string;
-  phone: string;
+  range: {
+    from: number;
+    to: number;
+  };
+  category: string[];
 };
 
 const HomePage = () => {
@@ -97,9 +98,29 @@ const HomePage = () => {
 
   const handleChangeFilter = (changedValues: any, values: any) => {
     console.log(">>> check handleChangeFilter", changedValues, values);
+    console.log(">>> check handleChangeFilter", values);
+    if (changedValues.category) {
+      const cate = values.category;
+      if (cate && cate.length > 0) {
+        const f = cate.join(",");
+        setFilter(`category=${f}`);
+      } else {
+        //reset data -> fetch all
+        setFilter("");
+      }
+    }
   };
 
-  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {};
+  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+    if (values?.range?.from >= 0 && values?.range?.to >= 0) {
+      let f = `price>=${values?.range?.from}&price<=${values?.range?.to}`;
+      if (values?.category?.length) {
+        const cate = values?.category?.join(",");
+        f += `&category=${cate}`;
+      }
+      setFilter(f);
+    }
+  };
 
   const onChange = (key: string) => {
     console.log(key);
@@ -107,22 +128,22 @@ const HomePage = () => {
 
   const items = [
     {
-      key: "1",
+      key: "sort=-sold",
       label: `Phổ biến`,
       children: <></>,
     },
     {
-      key: "2",
+      key: "sort=-updatedAt",
       label: `Hàng Mới`,
       children: <></>,
     },
     {
-      key: "3",
+      key: "sort=price",
       label: `Giá Thấp Đến Cao`,
       children: <></>,
     },
     {
-      key: "4",
+      key: "sort=-price",
       label: `Giá Cao Đến Thấp`,
       children: <></>,
     },
@@ -147,7 +168,10 @@ const HomePage = () => {
                 </span>
                 <ReloadOutlined
                   title="Reset"
-                  onClick={() => form.resetFields()}
+                  onClick={() => {
+                    form.resetFields();
+                    setFilter("");
+                  }}
                 />
               </div>
               <Divider />
