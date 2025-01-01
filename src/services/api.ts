@@ -87,3 +87,8 @@ export const deleteUserAPI = (_id: string) => {
   const urlBackend = `/api/v1/user/${_id}`;
   return axios.delete<IBackendRes<IRegister>>(urlBackend);
 };
+
+export const getBooksAPI = (query: string) => {
+  const urlBackend = `/api/v1/book?${query}`;
+  return axios.get<IBackendRes<IModelPaginate<IBookTable>>>(urlBackend)
+}
