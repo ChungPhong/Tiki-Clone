@@ -25,9 +25,13 @@ export const AppProvider = (props: TProps) => {
   useEffect(() => {
     const fetchAccount = async () => {
       const res = await fetchAcountApi();
+      const carts = localStorage.getItem("carts");
       if (res.data) {
         setUser(res.data.user);
         setIsAuthenticated(true);
+        if (carts) {
+          setCarts(JSON.parse(carts));
+        }
       }
       setIsAppLoading(false);
     };
