@@ -56,5 +56,18 @@
         background-color: #e45b3f;
       }
     }
+    .info,
+    .method,
+    .address {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+  .order-steps {
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
   }
 }

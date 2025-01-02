@@ -1,11 +1,17 @@
-import { Col, Divider, InputNumber, Row } from "antd";
+import { App, Col, Divider, Empty, InputNumber, Row } from "antd";
 import { DeleteTwoTone } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useCurrentApp } from "@/components/context/app.context";
 import "styles/order.scss";
-const OrderDetail = () => {
+
+interface IProps {
+  setCurrentStep: (v: number) => void;
+}
+const OrderDetail = (props: IProps) => {
+  const { setCurrentStep } = props;
   const { carts, setCarts } = useCurrentApp();
   const [totalPrice, setTotalPrice] = useState(0);
+  const { message } = App.useApp();
   useEffect(() => {
     if (carts && carts.length > 0) {
       let sum = 0;
@@ -47,6 +53,15 @@ const OrderDetail = () => {
       setCarts(newCarts);
     }
   };
+
+  const handleNextStep = () => {
+    if (!carts.length) {
+      message.error("Không tồn tại sản phẩm trong giỏ hàng.");
+      return;
+    }
+    setCurrentStep(1);
+  };
+
   return (
     <div style={{ background: "#efefef", padding: "20px 0" }}>
       <div
@@ -98,6 +113,9 @@ const OrderDetail = () => {
                 </div>
               );
             })}
+            {carts.length === 0 && (
+              <Empty description="Không có sản phẩm trong giỏ hàng" />
+            )}
           </Col>
           <Col md={6} xs={24}>
             <div className="order-sum">
@@ -121,7 +139,9 @@ const OrderDetail = () => {
                 </span>
               </div>
               <Divider style={{ margin: "10px 0" }} />
-              <button>Mua Hàng ({carts?.length ?? 0})</button>
+              <button onClick={() => handleNextStep()}>
+                Mua Hàng ({carts?.length ?? 0})
+              </button>
             </div>
           </Col>
         </Row>
