@@ -1,4 +1,4 @@
-import { Row, Col, Rate, Divider, App } from "antd";
+import { Row, Col, Rate, Divider, App, Breadcrumb } from "antd";
 import ImageGallery from "react-image-gallery";
 import { useEffect, useRef, useState } from "react";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
@@ -6,6 +6,7 @@ import { BsCartPlus } from "react-icons/bs";
 import "styles/book.scss";
 import ModalGallery from "./modal.gallery";
 import { useCurrentApp } from "@/components/context/app.context";
+import { Link, useNavigate } from "react-router-dom";
 interface IProps {
   currentBook: IBookTable | null;
 }
@@ -26,8 +27,9 @@ const BookDetail = (props: IProps) => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const refGallery = useRef<ImageGallery>(null);
   const [currentQuantity, setCurrentQuantity] = useState<number>(1);
-  const { setCarts } = useCurrentApp();
+  const { setCarts, user } = useCurrentApp();
   const { message } = App.useApp();
+  const navigate = useNavigate();
 
   // const images = [
   //   {
@@ -142,7 +144,11 @@ const BookDetail = (props: IProps) => {
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (isBuyNow = false) => {
+    if (!user) {
+      message.error("Bạn cần đăng nhập để thực hiện tính năng này.");
+      return;
+    }
     //update localStorage
     const cartStorage = localStorage.getItem("carts");
 
@@ -177,7 +183,9 @@ const BookDetail = (props: IProps) => {
       //sync React Context
       setCarts(data);
     }
-    message.success("Thêm sản phẩm vào giỏ hàng thành công.");
+    if (isBuyNow) {
+      navigate("/order");
+    } else message.success("Thêm sản phẩm vào giỏ hàng thành công.");
   };
 
   return (
@@ -190,6 +198,17 @@ const BookDetail = (props: IProps) => {
           minHeight: "calc(100vh - 150px)",
         }}
       >
+        <Breadcrumb
+          separator=">"
+          items={[
+            {
+              title: <Link to={"/"}>Trang Chủ</Link>,
+            },
+            {
+              title: "Xem chi tiết sách",
+            },
+          ]}
+        />
         <div style={{ padding: "20px", background: "#fff", borderRadius: 5 }}>
           <Row gutter={[20, 20]}>
             <Col md={10} sm={0} xs={0}>
@@ -268,7 +287,9 @@ const BookDetail = (props: IProps) => {
                     <BsCartPlus className="icon-cart" />
                     <span>Thêm vào giỏ hàng</span>
                   </button>
-                  <button className="now">Mua ngay</button>
+                  <button onClick={() => handleAddToCart(true)} className="now">
+                    Mua ngay
+                  </button>
                 </div>
               </Col>
             </Col>

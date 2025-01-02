@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppstoreOutlined,
   ExceptionOutlined,
@@ -10,61 +10,72 @@ import {
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Dropdown, Space, Avatar } from "antd";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useCurrentApp } from "../context/app.context";
 import type { MenuProps } from "antd";
 import { logoutAPI } from "@/services/api";
 type MenuItem = Required<MenuProps>["items"][number];
+
 const { Content, Footer, Sider } = Layout;
+
 const LayoutAdmin = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [activeMenu, setActiveMenu] = useState("dashboard");
-  const { user, setUser, setIsAuthenticated, isAuthenticated } =
+  const [activeMenu, setActiveMenu] = useState("");
+  const { user, setUser, setIsAuthenticated, isAuthenticated, setCarts } =
     useCurrentApp();
+
+  const location = useLocation();
+
+  const items: MenuItem[] = [
+    {
+      label: <Link to="/admin">Dashboard</Link>,
+      key: "/admin",
+      icon: <AppstoreOutlined />,
+    },
+    {
+      label: <span>Manage Users</span>,
+      key: "/admin/user",
+      icon: <UserOutlined />,
+      children: [
+        {
+          label: <Link to="/admin/user">CRUD</Link>,
+          key: "/admin/user",
+          icon: <TeamOutlined />,
+        },
+      ],
+    },
+    {
+      label: <Link to="/admin/book">Manage Books</Link>,
+      key: "/admin/book",
+      icon: <ExceptionOutlined />,
+    },
+    {
+      label: <Link to="/admin/order">Manage Orders</Link>,
+      key: "/admin/order",
+      icon: <DollarCircleOutlined />,
+    },
+  ];
+
+  useEffect(() => {
+    const active: any =
+      items.find((item) => location.pathname === (item!.key as any)) ??
+      "/admin";
+    setActiveMenu(active.key);
+  }, [location]);
+
   const handleLogout = async () => {
     //todo
     const res = await logoutAPI();
     if (res.data) {
       setUser(null);
+      setCarts([]);
       setIsAuthenticated(false);
       localStorage.removeItem("access_token");
+      localStorage.removeItem("carts");
     }
   };
-  const items: MenuItem[] = [
-    {
-      label: <Link to="/admin">Dashboard</Link>,
-      key: "dashboard",
-      icon: <AppstoreOutlined />,
-    },
-    {
-      label: <span>Manage Users</span>,
-      key: "user",
-      icon: <UserOutlined />,
-      children: [
-        {
-          label: <Link to="/admin/user">CRUD</Link>,
-          key: "crud",
-          icon: <TeamOutlined />,
-        },
-        // {
-        //     label: 'Files1',
-        //     key: 'file1',
-        //     icon: <TeamOutlined />,
-        // }
-      ],
-    },
-    {
-      label: <Link to="/admin/book">Manage Books</Link>,
-      key: "book",
-      icon: <ExceptionOutlined />,
-    },
-    {
-      label: <Link to="/admin/order">Manage Orders</Link>,
-      key: "order",
-      icon: <DollarCircleOutlined />,
-    },
-  ];
+
   const itemsDropdown = [
     {
       label: (
@@ -87,12 +98,15 @@ const LayoutAdmin = () => {
       key: "logout",
     },
   ];
+
   const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/images/avatar/${
     user?.avatar
   }`;
+
   if (isAuthenticated === false) {
     return <Outlet />;
   }
+
   const isAdminRoute = location.pathname.includes("admin");
   if (isAuthenticated === true && isAdminRoute === true) {
     const role = user?.role;
@@ -100,6 +114,7 @@ const LayoutAdmin = () => {
       return <Outlet />;
     }
   }
+
   return (
     <>
       <Layout style={{ minHeight: "100vh" }} className="layout-admin">
@@ -113,7 +128,8 @@ const LayoutAdmin = () => {
             Admin
           </div>
           <Menu
-            defaultSelectedKeys={[activeMenu]}
+            // defaultSelectedKeys={[activeMenu]}
+            selectedKeys={[activeMenu]}
             mode="inline"
             items={items}
             onClick={(e) => setActiveMenu(e.key)}
@@ -151,11 +167,12 @@ const LayoutAdmin = () => {
             <Outlet />
           </Content>
           <Footer style={{ padding: 0, textAlign: "center" }}>
-            React &copy; Chung Phong - Made with <HeartTwoTone />
+            React Test Fresher &copy; Hỏi Dân IT - Made with <HeartTwoTone />
           </Footer>
         </Layout>
       </Layout>
     </>
   );
 };
+
 export default LayoutAdmin;
