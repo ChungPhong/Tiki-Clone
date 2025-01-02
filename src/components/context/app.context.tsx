@@ -8,6 +8,8 @@ interface IAppContext {
   user: IUser | null;
   setIsAppLoading: (v: boolean) => void;
   isAppLoading: boolean;
+  carts: ICart[];
+  setCarts: (v: ICart[]) => void;
 }
 const CurrentAppContext = createContext<IAppContext | null>(null);
 type TProps = {
@@ -17,6 +19,8 @@ export const AppProvider = (props: TProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isAppLoading, setIsAppLoading] = useState<boolean>(true);
   const [user, setUser] = useState<IUser | null>(null);
+
+  const [carts, setCarts] = useState<ICart[]>([]);
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -41,6 +45,8 @@ export const AppProvider = (props: TProps) => {
             setUser,
             isAppLoading,
             setIsAppLoading,
+            carts,
+            setCarts,
           }}
         >
           {props.children}
