@@ -132,7 +132,7 @@ const AppHeader = (props: IProps) => {
                 <span onClick={() => navigate("/")}>
                   {" "}
                   <FaReact className="rotate icon-react" />
-                  Hỏi Dân !T
+                  Tiki
                 </span>
 
                 <VscSearchFuzzy className="icon-search" />
